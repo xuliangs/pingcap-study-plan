@@ -1,37 +1,51 @@
-use clap::{arg, command, Command};
+use clap::{Args, Parser, Subcommand};
+
+#[derive(Parser)]
+#[command(version)]
+#[command(propagate_version = true)]
+struct Cli {
+    #[command(subcommand)]
+    command: Commands,
+}
+
+#[derive(Subcommand)]
+enum Commands {
+    /// Set the value of a string key to a string
+    Set(SetArgs),
+    /// Get the string value of a given string key
+    Get(GetArgs),
+    /// Remove a given key
+    Rm(RmArgs),
+}
+
+#[derive(Args)]
+struct SetArgs {
+    key: String,
+    value: String,
+}
+
+#[derive(Args)]
+struct GetArgs {
+    key: String,
+}
+
+#[derive(Args)]
+struct RmArgs {
+    key: String,
+}
 
 fn main() {
-    let matches = command!()
-        .propagate_version(true)
-        .subcommand_required(true)
-        .subcommand(
-            Command::new("set")
-                .about("Set the value of a string key to a string")
-                .arg(arg!([KEY]))
-                .arg(arg!([VALUE])),
-        )
-        .subcommand(
-            Command::new("get")
-                .about("Get the string value of a given string key")
-                .arg(arg!([KEY])),
-        )
-        .subcommand(
-            Command::new("rm")
-                .about("Remove a given key")
-                .arg(arg!([KEY])),
-        )
-        .get_matches();
+    let cli = Cli::parse();
 
-    match matches.subcommand() {
-        Some(("set", _)) => {
+    match &cli.command {
+        Commands::Set(_) => {
             panic!("unimplemented");
         }
-        Some(("get", _)) => {
+        Commands::Get(_) => {
             panic!("unimplemented");
         }
-        Some(("rm", _)) => {
+        Commands::Rm(_) => {
             panic!("unimplemented");
         }
-        _ => unreachable!("Exhausted list of subcommands and subcommand_required prevents `None`"),
     }
 }
